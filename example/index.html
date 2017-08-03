@@ -34,7 +34,8 @@
   <script src="/js/index.js"></script>
   <script>
     block.onclick = function(){
-      let animation = SpriteAnimator.animate([{width:0},{width:150},{width:200}], 2000)
+      let animation = SpriteAnimator.generateAnimation([{width:0},{width:150},{width:200}], 2000)
+      
       requestAnimationFrame(function update(){
         let res = animation.next(),
             value = res.value
