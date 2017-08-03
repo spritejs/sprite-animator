@@ -1,9 +1,7 @@
 # Abstract animations for DOM or Canvas.
 
-## Usage
+## Installation
 
-in browser
-
-```html
-<script src="https://s0.ssl.qhres.com/!cbbe9cf4/sprite2-0.3.8.js"></script>
+```bash
+npm install sprite-animator
 ```

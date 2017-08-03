@@ -1,5 +1,5 @@
 {
-  "name": "sprite2",
+  "name": "sprite-animator",
   "version": "0.1.0",
   "description": "Abstract animation generators.",
   "main": "lib/index.js",
