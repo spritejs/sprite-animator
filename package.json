@@ -1,6 +1,6 @@
 {
   "name": "sprite-animator",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Abstract animation generators.",
   "main": "lib/index.js",
   "directories": {
@@ -15,9 +15,11 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "dependencies": {
+    "await-signal": "^0.1.1"
+  },
   "devDependencies": {
     "ava": "^0.21.0",
-    "axios": "^0.16.2",
     "babel-core": "^6.24.0",
     "babel-eslint": "^7.2.3",
     "babel-loader": "^6.4.1",

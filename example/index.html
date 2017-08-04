@@ -30,22 +30,62 @@
   </style>
 </head>
 <body>
+  <button id="start">开始</button>
+  <button id="pause">暂停</button>
+  <button id="play">继续</button>
+
   <div id="block"></div>
   <script src="/js/index.js"></script>
   <script>
-    block.onclick = function(){
-      let animation = SpriteAnimator.generateAnimation([{width:0},{width:150},{width:200}], 2000)
-      
-      requestAnimationFrame(function update(){
+    let animation, requestID
+
+    start.onclick = function(){
+      if(requestID){
+        cancelAnimationFrame(requestID)
+      }
+
+      animation = SpriteAnimator.generateAnimation([{width:0},{width:150},{width:200}], 
+        {duration:2000, delay: 500})
+
+      animation.play()
+
+      block.style.backgroundColor = 'red'
+
+      animation.signal.until('running').then(() => {
+        block.style.backgroundColor = 'green'
+      })
+
+      animation.signal.until('finished').then(() => {
+        block.style.backgroundColor = 'blue'
+      })
+
+      requestID = requestAnimationFrame(async function update(){
+        await animation.signal.while('idle')
+
         let res = animation.next(),
             value = res.value
 
-        block.style.width = value.width + 'px'
+        if(value){
+          block.style.width = value.width + 'px'
+        }
 
         if(!res.done){
+          await animation.signal.while('paused')
           requestAnimationFrame(update)
         }
       })
+    }
+
+    pause.onclick = function(){
+      if(animation){
+        animation.pause()
+      }
+    }
+
+    play.onclick = function(){
+      if(animation){
+        animation.play()
+      }
     }
   </script>
 </body>
