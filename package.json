@@ -16,7 +16,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "await-signal": "^0.1.1"
+    "await-signal": "^0.1.2"
   },
   "devDependencies": {
     "ava": "^0.21.0",
