@@ -51,16 +51,16 @@
 
       block.style.backgroundColor = 'red'
 
-      animation.signal.until('running').then(() => {
+      animation.until('running').then(() => {
         block.style.backgroundColor = 'green'
       })
 
-      animation.signal.until('finished').then(() => {
+      animation.until('finished').then(() => {
         block.style.backgroundColor = 'blue'
       })
 
       requestID = requestAnimationFrame(async function update(){
-        await animation.signal.while('idle')
+        await animation.while('idle')
 
         let res = animation.next(),
             value = res.value
@@ -70,7 +70,7 @@
         }
 
         if(!res.done){
-          await animation.signal.while('paused')
+          await animation.while('paused')
           requestAnimationFrame(update)
         }
       })
