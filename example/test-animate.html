@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Animate</title>
+  <style>
+    #block {
+      width: 50px;
+      height: 50px;
+      position: absolute;
+      left: 100px;
+      top: 100px;
+      background-color: blue;
+    }
+  </style>
+  <script src="web-animations.min.js"></script>
+</head>
+<body>
+  <button id="startBtn">开始</button>
+  <button id="finishBtn">停止</button>
+  <button id="cancelBtn">取消</button>
+  <div id = "block"/>
+  <script>
+    const frames = [
+      {left: '50px'},
+      {left: '200px'},
+    ];
+    const timing = {
+      duration: 1000,
+      //fill: 'both',
+      //direction: 'reverse',
+      playbackRate: 5.0,
+      iterations: 2.9,
+      delay: 500,
+      endDelay: 1000,
+    }
+    let anim
+    startBtn.onclick = function(){
+      block.style.backgroundColor = 'green'
+      anim = block.animate(frames, timing)
+      
+      // anim.finished.then(function(){
+      //   console.log('finished!!')
+      // })
+
+      anim.onfinish = function(){
+        console.log('finished')
+        block.style.backgroundColor = 'red'
+      }
+    }
+
+    finishBtn.onclick = function(){
+      anim && anim.finish()
+    }
+
+    cancelBtn.onclick = function(){
+      anim && anim.cancel()
+    }
+  </script>
+</body>
+</html>

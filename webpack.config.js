@@ -37,7 +37,7 @@ module.exports = function (env = {}) {
       filename: env.production ? `sprite-animator-${version}.js` : 'index.js',
       path: path.resolve(__dirname, 'dist'),
       publicPath: '/js/',
-      library: 'SpriteAnimator',
+      library: 'spriteAnimator',
       libraryTarget: 'umd'
     },
 

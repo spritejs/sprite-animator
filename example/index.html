@@ -22,10 +22,13 @@
       position: absolute;
       left: 100px;
       top: 100px;
-      width: 50px;
+      width: 100px;
       height: 50px;
       overflow: hidden;
       background: red;
+      color: white;
+      text-align: center;
+      line-height: 50px;
     }
   </style>
 </head>
@@ -33,60 +36,99 @@
   <button id="start">开始</button>
   <button id="pause">暂停</button>
   <button id="play">继续</button>
-
-  <div id="block"></div>
+  <button id="finish">结束</button>
+  <button id="cancel">取消</button>
+  <button id="x1">正常</button>
+  <button id="x2">2倍</button>
+  <button id="x4">4倍</button>
+  <div id="block">idle</div>
   <script src="/js/index.js"></script>
   <script>
-    let animation, requestID
+    const animation = new spriteAnimator.Animator({width: 100},
+        [{width:50},{width:180, offset: 0.7},{width:200}], 
+        {
+          duration:2000, 
+          delay: 1000, 
+          endDelay: 2000,
+          fill: 'both',
+          iterations: 2.5,
+          //playbackRate: 0.5,
+        })
+
+    let requestID;
 
     start.onclick = function(){
       if(requestID){
         cancelAnimationFrame(requestID)
       }
+      animation.cancel()
 
-      animation = SpriteAnimator.generateAnimation([{width:0},{width:150},{width:200}], 
-        {duration:2000, delay: 500})
+      requestID = requestAnimationFrame(function update(){
+        const frame = animation.frame
 
-      animation.play()
+        if(frame){
+          block.style.width = frame.width + 'px'
+        }
 
-      block.style.backgroundColor = 'red'
+        if(animation.playState !== 'finished' && animation.playState !== 'idle') {
+          requestID = requestAnimationFrame(update)
+        }
+      })
 
-      animation.until('running').then(() => {
+      block.style.backgroundColor = 'black'
+      block.innerHTML = animation.playState
+
+      console.log('start')
+      animation.ready.then(() => {
         block.style.backgroundColor = 'green'
       })
 
-      animation.until('finished').then(() => {
-        block.style.backgroundColor = 'blue'
+      animation.finished.then(() => {
+        block.style.backgroundColor = '#37c'
+        block.innerHTML = animation.playState
+        console.log('finished!')
       })
 
-      requestID = requestAnimationFrame(async function update(){
-        await animation.while('idle')
-        await animation.while('pending')
-        
-        let res = animation.next(),
-            value = res.value
+      animation.play()
+      block.innerHTML = animation.playState
 
-        if(value){
-          block.style.width = value.width + 'px'
-        }
-
-        if(!res.done){
-          await animation.while('paused')
-          requestAnimationFrame(update)
-        }
+      animation.ready.then(() => {
+        console.log('ready!')
+        block.innerHTML = animation.playState
       })
     }
 
     pause.onclick = function(){
-      if(animation){
-        animation.pause()
-      }
+      animation.pause()
+      block.innerHTML = animation.playState
     }
 
     play.onclick = function(){
-      if(animation){
-        animation.play()
-      }
+      animation.play()
+      block.innerHTML = animation.playState
+      animation.ready.then(() => {
+        console.log('resumed！')
+      })
+    }
+
+    cancel.onclick = function(){
+      animation.cancel()
+      block.style.backgroundColor = ''
+      block.style.width = animation.frame.width + 'px'
+    }
+
+    finish.onclick = function(){
+      animation.finish()
+    }
+
+    x1.onclick = function(){
+      animation.playbackRate = 1.0
+    }
+    x2.onclick = function(){
+      animation.playbackRate = 2.0
+    }
+    x4.onclick = function(){
+      animation.playbackRate = 4.0
     }
   </script>
 </body>
