@@ -101,13 +101,27 @@ test('seek entropy', async (t) => {
   t.is(idx, 2)
 })
 
-test.cb('timeline setTimeout', t => {
+test.cb('timeline setTimeout time', t => {
+  const timeline = new Timeline()
+  timeline.playbackRate = -2
+
+  const now = nowtime()
+
+  timeline.setTimeout(() => {
+    console.log('te, global: %s', nowtime() - now)
+    console.log('te, current: %s', timeline.currentTime)
+    t.truthy(Math.abs(timeline.currentTime + 100) <= 30)
+    t.end()
+  }, {time: -100})
+})
+
+test.cb('timeline setTimeout entropy', t => {
   const timeline = new Timeline()
   timeline.setTimeout(() => {
     console.log('t, current: %s', timeline.currentTime)
     t.truthy(Math.abs(timeline.currentTime - 100) <= 30)
     t.end()
-  }, 100)
+  }, {entropy: 100})
 })
 
 test.cb('timeline setTimeout2', t => {
