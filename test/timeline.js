@@ -65,7 +65,7 @@ test('timeline playbackRate', async (t) => {
   t.truthy(Math.abs(timeline.currentTime) <= 30)
 })
 
-test('timeline duration', async (t) => {
+test('timeline entropy', async (t) => {
   const timeline = new Timeline()
   await sleep(50)
 
@@ -76,12 +76,12 @@ test('timeline duration', async (t) => {
   await sleep(50)
 
   console.log('current: %s', timeline.currentTime)
-  console.log('duration: %s', timeline.duration)
+  console.log('entropy: %s', timeline.entropy)
 
-  t.truthy(Math.abs(timeline.duration - 300) <= 150)
+  t.truthy(Math.abs(timeline.entropy - 300) <= 150)
 })
 
-test('seek duration', async (t) => {
+test('seek entropy', async (t) => {
   const timeline = new Timeline()
   await sleep(50)
 
@@ -121,7 +121,7 @@ test.cb('timeline setTimeout2', t => {
 
   timeline.setTimeout(() => {
     console.log('t2, current: %s', timeline.currentTime)
-    console.log('t2, duration: %s', timeline.duration)
+    console.log('t2, entropy: %s', timeline.entropy)
     console.log('t2, time: %s', nowtime() - now)
     t.truthy(Math.abs(nowtime() - now - 800) <= 100)
     t.end()
