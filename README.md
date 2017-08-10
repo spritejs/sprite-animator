@@ -1,4 +1,9 @@
-# Abstract animations for DOM or Canvas.
+# An implementation of the abstract Animation interface.
+
+[![npm status](https://img.shields.io/npm/v/sprite-animator.svg)](https://www.npmjs.org/package/sprite-animator)
+[![build status](https://api.travis-ci.org/spritejs/sprite-animator.svg?branch=master)](https://travis-ci.org/spritejs/sprite-animator) 
+[![dependency status](https://david-dm.org/spritejs/sprite-animator.svg)](https://david-dm.org/spritejs/sprite-animator)
+[![coverage status](https://img.shields.io/coveralls/spritejs/sprite-animator.svg)](https://coveralls.io/github/spritejs/sprite-animator)
 
 ## Installation
 
@@ -13,3 +18,7 @@ in browser
 ```html
 <script src="https://s3.ssl.qhres.com/!11923bc8/sprite-animator-0.1.1.js"></script>
 ```
+
+## Lincense
+
+MIT

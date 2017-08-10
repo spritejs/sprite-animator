@@ -51,7 +51,9 @@
           delay: 1000, 
           endDelay: 2000,
           fill: 'both',
-          iterations: 2.5,
+          iterations: Infinity,
+          //direction: 'reverse',
+          direction: 'alternate-reverse',
           //playbackRate: 0.5,
         })
 
@@ -63,11 +65,18 @@
       }
       animation.cancel()
 
-      requestID = requestAnimationFrame(function update(){
+      requestID = requestAnimationFrame(async function update(){
         const frame = animation.frame
 
         if(frame){
           block.style.width = frame.width + 'px'
+        }
+
+        console.log(frame)
+        await animation.ready
+
+        if(animation.playState === 'pending'){
+          await animation.finished
         }
 
         if(animation.playState !== 'finished' && animation.playState !== 'idle') {
