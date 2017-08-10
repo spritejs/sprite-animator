@@ -58,7 +58,7 @@ function _caseSync(fn){
   }
 }
 
-test('normal animator', _case(async t => {
+test('normal animation', _case(async t => {
   const animator = new Animator({x: 10}, [{x: 20, y: 0}, {x: 50, y: 100}], 500)
   t.truthy(t.time_compare(animator.progress, 0, 1))
   t.is(animator.playState, 'idle')
@@ -78,7 +78,7 @@ test('normal animator', _case(async t => {
   t.is(animator.playState, 'finished')
 }))
 
-test('animator delay', _case(async t => {
+test('animation delay', _case(async t => {
   const animator = new Animator({x: 10}, [{x: 20, y: 0, c:'red'}, {x: 50, y: 100, c:'green'}], 
         {delay: 200, duration:500, endDelay: 300})
 
@@ -107,5 +107,62 @@ test('animator delay', _case(async t => {
   t.truthy(t.time_compare(animator.progress, 1, 1))
   t.is(animator.playState, 'finished')  
   t.is(animator.frame.c, 'green')
+}))
+
+test('animation ready', _case(async t => {
+  const animator = new Animator({x: 10}, [{x: 20, y: 0, c:'red'}, {x: 50, y: 100, c:'green'}], 
+        {delay: 200, duration:500, endDelay: 300})
+
+  t.is(animator.playState, 'idle')
+
+  animator.play()
+
+  await animator.ready
+
+  t.is(animator.playState, 'running')
+
+  await sleep(100)
+
+  await animator.ready
+
+  t.truthy(t.time_compare(animator.progress, 0.2, 1))
+  animator.pause()
+
+  setTimeout(() => {
+    animator.play()
+  }, 100)
+
+  await animator.ready
+  t.is(animator.playState, 'running')
+
+  t.truthy(t.time_compare(animator.progress, 0.2, 1))
+}))
+
+test('animation finished', _case(async t => {
+  const animator = new Animator({x: 10}, [{x: 20, y: 0, c:'red'}, {x: 50, y: 100, c:'green'}], 
+        {delay: 200, duration:500, endDelay: 300})
+
+  t.is(animator.playState, 'idle')
+  animator.play()
+
+  await animator.finished
+  t.is(animator.playState, 'finished')
+  t.truthy(t.time_compare(animator.timeline.currentTime, 800))
+
+  await animator.finished
+  t.is(animator.playState, 'finished')
+
+  animator.cancel()
+  t.is(animator.playState, 'idle')
+  animator.play()
+  t.is(animator.playState, 'pending')
+
+  let now = Date.now()
+  setTimeout(() => {
+    animator.finish()
+  }, 100)
+  await animator.finished
+  t.is(animator.playState, 'finished')
+  t.truthy(t.time_compare(Date.now() - now, 100))
 }))
 

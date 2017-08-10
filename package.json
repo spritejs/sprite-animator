@@ -16,6 +16,7 @@
   "author": "",
   "license": "MIT",
   "dependencies": {
+    "bezier-easing": "^2.0.3",
     "sprite-timeline": "^1.0.1"
   },
   "devDependencies": {

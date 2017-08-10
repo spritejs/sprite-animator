@@ -23,16 +23,18 @@
   <script>
     const frames = [
       {left: '50px'},
+      {left: '199px', offset: 0.5},
       {left: '200px'},
     ];
     const timing = {
-      duration: 1000,
-      //fill: 'both',
-      direction: 'reverse',
-      playbackRate: 5.0,
-      iterations: 2.9,
+      duration: 5000,
+      fill: 'both',
+      //direction: 'reverse',
+      playbackRate: 1.0,
+      iterations: 1,
       delay: 500,
       endDelay: 1000,
+      easing: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
     }
     let anim
     startBtn.onclick = function(){

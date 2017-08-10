@@ -44,18 +44,77 @@
   <div id="block">idle</div>
   <script src="/js/index.js"></script>
   <script>
-    const animation = new spriteAnimator.Animator({width: 100},
-        [{width:50},{width:180, offset: 0.7},{width:200}], 
+
+    const colorMap = {}
+    function parseColor(colorStr) {
+      if(typeof colorStr === 'string') {
+        if(colorMap[colorStr]){
+          return colorMap[colorStr]
+        }
+
+        const canvas = document.createElement('canvas'),
+          context = canvas.getContext('2d')
+
+        context.fillStyle = colorStr
+        context.fillRect(0, 0, 1, 1)
+        const data = context.getImageData(0, 0, 1, 1).data
+
+        colorMap[colorStr] = {
+          red: data[0],
+          green: data[1],
+          blue: data[2],
+          alpha: data[3] / 255,
+        }
+        return colorMap[colorStr]
+      }
+      return colorStr
+    }
+
+    const animation = new spriteAnimator.Animator(
+        {width: '100px'},
+        [{width: '50px', backgroundColor: 'grey'},
+         {width: '180px', offset: 0.7, backgroundColor: '#737'},
+         {width: '200px', backgroundColor: '#373'}], 
         {
           duration:2000, 
           delay: 1000, 
           endDelay: 2000,
           fill: 'both',
-          iterations: Infinity,
-          //direction: 'reverse',
-          direction: 'alternate-reverse',
+          //iterations: 2.5,
+          //iterations: Infinity,
+          direction: 'reverse',
+          //direction: 'alternate-reverse',
           //playbackRate: 0.5,
+          //easing: 'ease-in-out',
+          easing: {
+            type: 'cubic-bezier',
+            value: [0.68, -0.55, 0.265, 1.55],
+          },
         })
+
+    animation.applyEffects({
+      width: function(from, to, p, start, end){
+        from  = parseInt(from)
+        to = parseInt(to)
+
+        const dp = (p - start) / (end - start)
+
+        return Math.round(from + (to - from) * dp) + 'px'
+      },
+      backgroundColor: function(from, to, p, start, end){
+        from = parseColor(from)
+        to = parseColor(to)
+
+        const dp = (p - start) / (end - start)
+
+        const r = Math.round(from.red + (to.red - from.red) * dp)
+        const g = Math.round(from.green + (to.green - from.green) * dp)
+        const b = Math.round(from.blue + (to.blue - from.blue) * dp)
+        const a = Math.round(from.alpha + (to.alpha - from.alpha) * dp)
+
+        return `rgba(${r},${g},${b},${a})`
+      }
+    })
 
     let requestID;
 
@@ -69,13 +128,15 @@
         const frame = animation.frame
 
         if(frame){
-          block.style.width = frame.width + 'px'
+          block.style.width = frame.width
+          block.style.backgroundColor = frame.backgroundColor
         }
 
-        console.log(frame)
         await animation.ready
+        console.log(frame, animation.playState)
 
         if(animation.playState === 'pending'){
+          block.innerHTML = 'pending'
           await animation.finished
         }
 
