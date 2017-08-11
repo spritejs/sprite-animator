@@ -119,7 +119,7 @@ module.exports = {
     'max-len': 'off',
     // 禁止一个文件中在忽略空行和注释之后行数超过300行
     'max-lines': ['error', {
-      max: 300,
+      max: 1000,
       skipBlankLines: true,
       skipComments: true
     }],
