@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Animate</title>
+  <style>
+    @keyframes jump{
+      0% {
+        left: 50px;
+      }
+      50% {
+        left: 100px;
+      }
+      100% {
+        left: 200px;
+      }
+    }
+    #block {
+      width: 50px;
+      height: 50px;
+      position: absolute;
+      left: 100px;
+      top: 100px;
+      background-color: blue;
+      animation: jump 2s step-end forwards;
+    }
+  </style>
+  <!--<script src="web-animations.min.js"></script>-->
+</head>
+<body>
+  <div id = "block"/>
+</body>
+</html>

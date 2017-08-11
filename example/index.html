@@ -82,18 +82,21 @@
           fill: 'both',
           //iterations: 2.5,
           //iterations: Infinity,
-          direction: 'reverse',
+          //direction: 'reverse',
           //direction: 'alternate-reverse',
           //playbackRate: 0.5,
-          //easing: 'ease-in-out',
-          easing: {
-            type: 'cubic-bezier',
-            value: [0.68, -0.55, 0.265, 1.55],
-          },
+          //easing: 'steps(1, end)',
+          easing: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+          //easing: 'ease-in',
+          // easing: {
+          //   type: 'cubic-bezier',
+          //   value: [0.68, -0.55, 0.265, 1.55],
+          // },
         })
 
     animation.applyEffects({
       width: function(from, to, p, start, end){
+        //console.log(from, to, p, start, end)
         from  = parseInt(from)
         to = parseInt(to)
 
@@ -133,7 +136,7 @@
         }
 
         await animation.ready
-        console.log(frame, animation.playState)
+        //console.log(frame, animation.playState)
 
         if(animation.playState === 'pending'){
           block.innerHTML = 'pending'
@@ -163,7 +166,7 @@
       block.innerHTML = animation.playState
 
       animation.ready.then(() => {
-        console.log('ready!')
+        console.log('ready!', animation.playState)
         block.innerHTML = animation.playState
       })
     }
