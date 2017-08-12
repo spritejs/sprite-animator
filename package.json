@@ -1,6 +1,6 @@
 {
   "name": "sprite-animator",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "description": "Abstract animation generators.",
   "main": "lib/index.js",
   "directories": {
@@ -17,7 +17,7 @@
   "license": "MIT",
   "dependencies": {
     "bezier-easing": "^2.0.3",
-    "sprite-timeline": "^1.1.1"
+    "sprite-timeline": "^1.1.2"
   },
   "devDependencies": {
     "ava": "^0.21.0",
