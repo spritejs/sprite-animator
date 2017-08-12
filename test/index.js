@@ -106,7 +106,7 @@ test('animation delay', _case(async t => {
   await sleep(400)
   t.truthy(t.time_compare(animator.progress, 1, 1))
   t.is(animator.playState, 'finished')  
-  t.is(animator.frame.c, 'green')
+  t.is(animator.frame.c, undefined)
 }))
 
 test('animation ready', _case(async t => {

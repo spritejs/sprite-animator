@@ -19,6 +19,8 @@
   <button id="startBtn">开始</button>
   <button id="finishBtn">停止</button>
   <button id="cancelBtn">取消</button>
+  <button id="pauseBtn">暂停</button>
+  <button id="playBtn">继续</button>
   <div id = "block"/>
   <script>
     const frames = [
@@ -59,6 +61,14 @@
 
     cancelBtn.onclick = function(){
       anim && anim.cancel()
+    }
+
+    playBtn.onclick = function(){
+      anim && anim.play()
+    }
+
+    pauseBtn.onclick = function(){
+      anim && anim.pause()
     }
   </script>
 </body>

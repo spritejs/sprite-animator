@@ -1,13 +1,13 @@
 {
   "name": "sprite-animator",
-  "version": "1.0.1",
+  "version": "1.0.3",
   "description": "Abstract animation generators.",
   "main": "lib/index.js",
   "directories": {
     "example": "example"
   },
   "scripts": {
-    "test": "nyc ava",
+    "test": "nyc ava --serial",
     "lint": "eslint 'lib/**/*.js' --fix",
     "start": "webpack-dev-server -d --quiet --port 9090 & http-server example -c-1 -p 9091",
     "deploy": "rm -rf dist/* && ./script/deploy.js"
