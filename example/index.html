@@ -71,10 +71,12 @@
     }
 
     const animation = new spriteAnimator.Animator(
-        {width: '100px'},
-        [{width: '50px', backgroundColor: 'grey'},
+        {width: '100px', backgroundColor: 'grey'},
+        [
+         {width: '50px', backgroundColor: 'grey'},
          {width: '180px', offset: 0.7, backgroundColor: '#737'},
-         {width: '200px', backgroundColor: '#373'}], 
+         {width: '200px', backgroundColor: '#373'}
+        ], 
         {
           duration:2000, 
           delay: 1000, 
