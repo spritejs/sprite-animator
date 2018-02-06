@@ -32,7 +32,7 @@ module.exports = function (env = {}) {
   }
 
   return {
-    entry: './lib/index.js',
+    entry: './src/index.js',
     output: {
       filename: env.production ? `sprite-animator-${version}.js` : 'index.js',
       path: path.resolve(__dirname, 'dist'),
@@ -46,7 +46,7 @@ module.exports = function (env = {}) {
     module: {
       rules: [{
         test: /\.js$/,
-        exclude: /(node_modules\/(?!sprite-)|bower_components)/,
+        exclude: /(node_modules|bower_components)/,
         use: jsLoaders
       }]
     },
