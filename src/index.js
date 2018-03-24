@@ -410,9 +410,25 @@ class Animator {
   }
 }
 
+
+if(!global.requestAnimationFrame) {
+  global.requestAnimationFrame = function (fn) {
+    const now = Date.now()
+    return setTimeout(() => {
+      fn(now)
+    }, 16)
+  }
+
+  global.cancelAnimationFrame = function (id) {
+    return clearTimeout(id)
+  }
+}
+
 export {
   Animator,
   Easings,
   Effects,
   Timeline,
+  requestAnimationFrame,
+  cancelAnimationFrame
 }
