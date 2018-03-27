@@ -424,11 +424,30 @@ if(!global.requestAnimationFrame) {
   }
 }
 
-export {
+let _requestAnimationFrame,
+  _cancelAnimationFrame
+
+if(typeof requestAnimationFrame === 'undefined') {
+  _requestAnimationFrame = function (fn) {
+    const now = Date.now()
+    return setTimeout(() => {
+      fn(now)
+    }, 16)
+  }
+
+  _cancelAnimationFrame = function (id) {
+    return clearTimeout(id)
+  }
+} else {
+  _requestAnimationFrame = requestAnimationFrame
+  _cancelAnimationFrame = cancelAnimationFrame
+}
+
+module.exports = {
   Animator,
   Easings,
   Effects,
   Timeline,
-  requestAnimationFrame,
-  cancelAnimationFrame
+  requestAnimationFrame: _requestAnimationFrame,
+  cancelAnimationFrame: _cancelAnimationFrame,
 }
