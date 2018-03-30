@@ -410,44 +410,9 @@ class Animator {
   }
 }
 
-
-if(!global.requestAnimationFrame) {
-  global.requestAnimationFrame = function (fn) {
-    const now = Date.now()
-    return setTimeout(() => {
-      fn(now)
-    }, 16)
-  }
-
-  global.cancelAnimationFrame = function (id) {
-    return clearTimeout(id)
-  }
-}
-
-let _requestAnimationFrame,
-  _cancelAnimationFrame
-
-if(typeof requestAnimationFrame === 'undefined') {
-  _requestAnimationFrame = function (fn) {
-    const now = Date.now()
-    return setTimeout(() => {
-      fn(now)
-    }, 16)
-  }
-
-  _cancelAnimationFrame = function (id) {
-    return clearTimeout(id)
-  }
-} else {
-  _requestAnimationFrame = requestAnimationFrame
-  _cancelAnimationFrame = cancelAnimationFrame
-}
-
 module.exports = {
   Animator,
   Easings,
   Effects,
   Timeline,
-  requestAnimationFrame: _requestAnimationFrame,
-  cancelAnimationFrame: _cancelAnimationFrame,
 }
