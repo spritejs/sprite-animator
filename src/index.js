@@ -208,7 +208,8 @@ class Animator {
       return initState
     }
 
-    const entropy = this.timeline.entropy,
+    const currentTime = this.timeline.currentTime,
+      entropy = this.timeline.entropy,
       keyframes = this[_keyframes].slice(0)
 
     let inversed = false
@@ -217,10 +218,10 @@ class Animator {
       p = 1 - p
       inversed = true
     } else if(direction === 'alternate' || direction === 'alternate-reverse') {
-      let period = Math.floor(entropy / duration)
+      let period = Math.floor(currentTime / duration)
 
       if(p === 1) period--
-      period = Math.max(0, period)
+      // period = Math.max(0, period)
 
       if((period % 2) ^ (direction === 'alternate-reverse')) {
         p = 1 - p
