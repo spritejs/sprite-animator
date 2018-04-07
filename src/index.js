@@ -46,7 +46,10 @@ const _timing = Symbol('timing'),
   _initState = Symbol('initState'),
   _readyDefer = Symbol('readyDefer'),
   _finishedDefer = Symbol('finishedDefer'),
-  _effects = Symbol('_effects')
+  _effects = Symbol('_effects'),
+  _applyReadyTimer = Symbol('applyReadyTimer'),
+  _applyFinishTimer = Symbol('applyFinishTimer'),
+  _removeDefer = Symbol('removeDefer')
 
 /**
   easing: {
@@ -290,31 +293,42 @@ class Animator {
     return this[_timing].timeline
   }
 
+  [_applyReadyTimer]() {
+    if(this[_readyDefer] && !this[_readyDefer].timerID) {
+      this[_readyDefer].timerID = this.timeline.setTimeout(() => {
+        this[_readyDefer].resolve()
+        assert(this.playState === 'running' || this.playState === 'finished', `An error occured: ${this.playState}`)
+        delete this[_readyDefer]
+      }, {entropy: -this.timeline.entropy})
+    }
+  }
+
+  [_applyFinishTimer]() {
+    const {duration, iterations, endDelay} = this[_timing]
+    if(this[_finishedDefer] && !this[_finishedDefer].timerID) {
+      this[_finishedDefer].timerID = this.timeline.setTimeout(() => {
+        this[_finishedDefer].resolve()
+      }, {entropy: duration * iterations + endDelay - this.timeline.entropy})
+    }
+  }
+
   play() {
     if(this.playState === 'finished') {
       this.cancel()
     }
 
     if(this.playState === 'idle') {
-      const {delay, duration, iterations, endDelay, playbackRate, timeline} = this[_timing]
+      const {delay, playbackRate, timeline} = this[_timing]
       this.timeline = new Timeline({
         originTime: delay,
         playbackRate,
       }, timeline)
 
       if(this[_readyDefer] && !this[_readyDefer].timerID) {
-        this[_readyDefer].timerID = this.timeline.setTimeout(() => {
-          this[_readyDefer].resolve()
-          assert(this.playState === 'running' || this.playState === 'finished', `An error occured: ${this.playState}`)
-          delete this[_readyDefer]
-        }, {entropy: -this.timeline.entropy})
+        this[_applyReadyTimer]()
       }
 
-      if(this[_finishedDefer] && !this[_finishedDefer].timerID) {
-        this[_finishedDefer].timerID = this.timeline.setTimeout(() => {
-          this[_finishedDefer].resolve()
-        }, {entropy: duration * iterations + endDelay - this.timeline.entropy})
-      }
+      this[_applyFinishTimer]()
     } else if(this.playState === 'paused') {
       this.timeline.playbackRate = this.playbackRate
       if(this[_readyDefer] && !this[_readyDefer].timerID) {
@@ -324,19 +338,19 @@ class Animator {
     }
   }
 
+  [_removeDefer](deferID) {
+    const defered = this[deferID],
+      {timeline} = this
+
+    if(defered && timeline) {
+      timeline.clearTimeout(defered.timerID)
+    }
+    delete this[deferID]
+  }
+
   cancel() {
-    if(this[_readyDefer]) {
-      if(this.timeline) {
-        this.timeline.clearTimeout(this[_readyDefer].timerID)
-      }
-      delete this[_readyDefer]
-    }
-    if(this[_finishedDefer]) {
-      if(this.timeline) {
-        this.timeline.clearTimeout(this[_finishedDefer].timerID)
-      }
-      delete this[_finishedDefer]
-    }
+    this[_removeDefer](_readyDefer)
+    this[_removeDefer](_finishedDefer)
     this.timeline = null
   }
 
@@ -382,11 +396,7 @@ class Animator {
     this[_readyDefer] = defer()
 
     if(this.timeline) { // 已经在 pending 状态
-      this[_readyDefer].timerID = this.timeline.setTimeout(() => {
-        this[_readyDefer].resolve()
-        assert(this.playState === 'running' || this.playState === 'finished', `An error occured: ${this.playState}`)
-        delete this[_readyDefer]
-      }, {entropy: -this.timeline.entropy})
+      this[_applyReadyTimer]()
     }
 
     return this[_readyDefer].promise
@@ -399,11 +409,8 @@ class Animator {
     if(!this[_finishedDefer]) {
       this[_finishedDefer] = defer()
 
-      const {duration, iterations, endDelay} = this[_timing]
       if(this.timeline) {
-        this[_finishedDefer].timerID = this.timeline.setTimeout(() => {
-          this[_finishedDefer].resolve()
-        }, {entropy: duration * iterations + endDelay - this.timeline.entropy})
+        this[_applyFinishTimer]()
       }
     }
 
