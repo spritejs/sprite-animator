@@ -27,7 +27,7 @@ function makeTimeCompare(caseID, startTime){
     if(percent > 0.10 && percent <= 0.20){
       color = colors.yellow
     }
-    if(percent > 0.20){
+    if(percent > 0.20 || Number.isNaN(percent)){
       color = colors.red
       pass = false
     }

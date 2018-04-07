@@ -9,12 +9,13 @@ export function defer() {
 }
 
 export function periodicity(val, dur) {
-  const t = Math.floor(val / dur)
-  if(t) {
-    val -= t * dur
-    return val || dur // 周期值，0 的时候是 0，dur 的时候是 1，所以要分 t 是否为 0
+  let t = Math.floor(val / dur)
+  let v = val - t * dur
+  if(v === 0 && t > 0) {
+    v = dur
+    t--
   }
-  return val
+  return [t, v]
 }
 
 export function calculateFramesOffset(keyframes) {
@@ -49,4 +50,63 @@ export function calculateFramesOffset(keyframes) {
   }
 
   return keyframes
+}
+
+export function getProgress(timeline, timing, p) {
+  const {currentTime} = timeline,
+    {direction, duration} = timing
+  let inverted = false
+  if(direction === 'reverse') {
+    p = 1 - p
+    inverted = true
+  } else if(direction === 'alternate' || direction === 'alternate-reverse') {
+    let period = Math.floor(currentTime / duration)
+
+    if(p === 1) period--
+    // period = Math.max(0, period)
+
+    if((period % 2) ^ (direction === 'alternate-reverse')) {
+      p = 1 - p
+      inverted = true
+    }
+  }
+  return {p, inverted}
+}
+
+import Effects from './effect'
+export function getCurrentFrame(timing, keyframes, effects, p) {
+  const {easing, effect} = timing
+
+  p = easing(p, keyframes)
+
+  let ret = {}
+
+  for(let i = 1; i < keyframes.length; i++) {
+    const frame = keyframes[i],
+      offset = frame.offset
+
+    if(offset >= p || i === keyframes.length - 1) {
+      const previousFrame = keyframes[i - 1],
+        previousOffset = previousFrame.offset
+
+      if(effect) {
+        ret = effect(previousFrame, frame, p, previousOffset, offset)
+      } else {
+        for(const [key, value] of Object.entries(frame)) {
+          if(key !== 'offset') {
+            const effect = effects[key] || Effects[key] || Effects.default
+
+            const v = effect(previousFrame[key], value, p, previousOffset, offset)
+
+            if(v != null) {
+              ret[key] = v
+            }
+          }
+        }
+      }
+      break
+    }
+  }
+
+  return ret
 }

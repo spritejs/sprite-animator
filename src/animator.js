@@ -1,5 +1,5 @@
 
-import {defer, periodicity, calculateFramesOffset} from './utils'
+import {defer, periodicity, calculateFramesOffset, getProgress, getCurrentFrame} from './utils'
 import Effects from './effect'
 import Timeline from 'sprite-timeline'
 import {parseEasing} from './easing'
@@ -131,99 +131,46 @@ export default class {
       if(entropy < 0) {
         p = 0
       } else {
-        // return periodicity(iterations, 1)
         const time = timeline.seekLocalTime(iterations * duration)
-        p = periodicity(time, duration) / duration
+        p = periodicity(time, duration)[1] / duration
       }
     } else if(playState === 'running' || playState === 'paused') {
-      p = periodicity(timeline.currentTime, duration) / duration
+      p = periodicity(timeline.currentTime, duration)[1] / duration
     }
 
     if(playState === 'finished') {
-      p = periodicity(iterations, 1)
+      p = periodicity(iterations, 1)[1]
     }
 
     return p
   }
 
   get frame() {
-    let p = this.progress
-
     const playState = this.playState,
       initState = this[_initState],
-      {fill, direction, duration, easing, effect} = this[_timing]
+      {fill} = this[_timing]
 
     if(playState === 'idle') {
       return initState
     }
 
-    const {currentTime, entropy} = this.timeline,
+    const {entropy} = this.timeline,
       keyframes = this[_keyframes].slice(0)
 
-    let inversed = false
+    const {p, inverted} = getProgress(this.timeline, this[_timing], this.progress)
 
-    if(direction === 'reverse') {
-      p = 1 - p
-      inversed = true
-    } else if(direction === 'alternate' || direction === 'alternate-reverse') {
-      let period = Math.floor(currentTime / duration)
-
-      if(p === 1) period--
-      // period = Math.max(0, period)
-
-      if((period % 2) ^ (direction === 'alternate-reverse')) {
-        p = 1 - p
-        inversed = true
-      }
-    }
-
-    let ret = {}
-
+    let frameState = initState
     if(entropy < 0 && playState === 'pending') {
+      // 在开始前 delay 阶段
       if(fill === 'backwards' || fill === 'both') {
-        return inversed ? keyframes[keyframes.length - 1] : keyframes[0]
+        frameState = inverted ? keyframes[keyframes.length - 1] : keyframes[0]
       }
-      return initState
+    } else if((playState !== 'pending' && playState !== 'finished')
+      || fill === 'forwards' || fill === 'both') {
+      // 不在 endDelay 或结束状态，或 forwards
+      frameState = getCurrentFrame(this[_timing], keyframes, this[_effects], p)
     }
-
-    if(playState === 'pending' || playState === 'finished') {
-      if(fill !== 'forwards' && fill !== 'both') {
-        return initState
-      }
-    }
-
-    const effects = this[_effects]
-
-    p = easing(p, keyframes)
-
-    for(let i = 1; i < keyframes.length; i++) {
-      const frame = keyframes[i],
-        offset = frame.offset
-
-      if(offset >= p || i === keyframes.length - 1) {
-        const previousFrame = keyframes[i - 1],
-          previousOffset = previousFrame.offset
-
-        if(effect) {
-          ret = effect(previousFrame, frame, p, previousOffset, offset)
-        } else {
-          for(const [key, value] of Object.entries(frame)) {
-            if(key !== 'offset') {
-              const effect = effects[key] || Effects[key] || Effects.default
-
-              const v = effect(previousFrame[key], value, p, previousOffset, offset)
-
-              if(v != null) {
-                ret[key] = v
-              }
-            }
-          }
-        }
-        break
-      }
-    }
-
-    return ret
+    return frameState
   }
 
   pause() {
