@@ -10,9 +10,9 @@ const _timing = Symbol('timing'),
   _initState = Symbol('initState'),
   _readyDefer = Symbol('readyDefer'),
   _finishedDefer = Symbol('finishedDefer'),
-  _effects = Symbol('_effects'),
-  _applyReadyTimer = Symbol('applyReadyTimer'),
-  _applyFinishTimer = Symbol('applyFinishTimer'),
+  _effects = Symbol('effects'),
+  _activeReadyTimer = Symbol('activeReadyTimer'),
+  _activeFinishTimer = Symbol('activeFinishTimer'),
   _removeDefer = Symbol('removeDefer')
 
 /**
@@ -68,13 +68,11 @@ export default class {
 
     if(this[_keyframes][0].offset !== 0) {
       // 要补第一帧
-      const startFrame = Object.assign({}, this[_initState], {offset: 0})
-      this[_keyframes].unshift(startFrame)
+      this[_keyframes].unshift(Object.assign({}, this[_initState], {offset: 0}))
     }
     if(lastFrame.offset < 1) {
       // 要补最后一帧
-      const endFrame = Object.assign({}, lastFrame, {offset: 1})
-      this[_keyframes].push(endFrame)
+      this[_keyframes].push(Object.assign({}, lastFrame, {offset: 1}))
     }
 
     this[_effects] = {}
@@ -184,7 +182,7 @@ export default class {
     return this[_timing].timeline
   }
 
-  [_applyReadyTimer]() {
+  [_activeReadyTimer]() {
     if(this[_readyDefer] && !this[_readyDefer].timerID) {
       this[_readyDefer].timerID = this.timeline.setTimeout(() => {
         this[_readyDefer].resolve()
@@ -194,7 +192,7 @@ export default class {
     }
   }
 
-  [_applyFinishTimer]() {
+  [_activeFinishTimer]() {
     const {duration, iterations, endDelay} = this[_timing]
     if(this[_finishedDefer] && !this[_finishedDefer].timerID) {
       this[_finishedDefer].timerID = this.timeline.setTimeout(() => {
@@ -214,18 +212,11 @@ export default class {
         originTime: delay,
         playbackRate,
       }, timeline)
-
-      if(this[_readyDefer] && !this[_readyDefer].timerID) {
-        this[_applyReadyTimer]()
-      }
-
-      this[_applyFinishTimer]()
+      this[_activeReadyTimer]()
+      this[_activeFinishTimer]()
     } else if(this.playState === 'paused') {
       this.timeline.playbackRate = this.playbackRate
-      if(this[_readyDefer] && !this[_readyDefer].timerID) {
-        this[_readyDefer].resolve()
-        delete this[_readyDefer]
-      }
+      this[_activeReadyTimer]()
     }
   }
 
@@ -287,7 +278,7 @@ export default class {
     this[_readyDefer] = defer()
 
     if(this.timeline) { // 已经在 pending 状态
-      this[_applyReadyTimer]()
+      this[_activeReadyTimer]()
     }
 
     return this[_readyDefer].promise
@@ -301,7 +292,7 @@ export default class {
       this[_finishedDefer] = defer()
 
       if(this.timeline) {
-        this[_applyFinishTimer]()
+        this[_activeFinishTimer]()
       }
     }
 
