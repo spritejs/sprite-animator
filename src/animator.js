@@ -1,6 +1,5 @@
 
 import {defer, periodicity, calculateFramesOffset, getProgress, getCurrentFrame} from './utils'
-import Effects from './effect'
 import Timeline from 'sprite-timeline'
 import {parseEasing} from './easing'
 
