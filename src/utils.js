@@ -74,12 +74,34 @@ export function getProgress(timeline, timing, p) {
 }
 
 import Effects from './effect'
+
+function calculateFrame(previousFrame, nextFrame, effects, p) {
+  const ret = {}
+  for(const [key, value] of Object.entries(nextFrame)) {
+    if(key !== 'offset') {
+      const effect = effects[key] || effects.default
+
+      const v = effect(previousFrame[key], value, p, previousFrame.offset, nextFrame.offset)
+
+      if(v != null) {
+        ret[key] = v
+      }
+    }
+  }
+  return ret
+}
+
 export function getCurrentFrame(timing, keyframes, effects, p) {
   const {easing, effect} = timing
 
-  p = easing(p, keyframes)
+  if(!effect) {
+    // timing.effect 会覆盖掉 Effects 和 animator.applyEffects 中定义的 effects
+    effects = Object.assign({}, effects, Effects)
+  }
 
   let ret = {}
+
+  p = easing(p, keyframes)
 
   for(let i = 1; i < keyframes.length; i++) {
     const frame = keyframes[i],
@@ -92,17 +114,7 @@ export function getCurrentFrame(timing, keyframes, effects, p) {
       if(effect) {
         ret = effect(previousFrame, frame, p, previousOffset, offset)
       } else {
-        for(const [key, value] of Object.entries(frame)) {
-          if(key !== 'offset') {
-            const effect = effects[key] || Effects[key] || Effects.default
-
-            const v = effect(previousFrame[key], value, p, previousOffset, offset)
-
-            if(v != null) {
-              ret[key] = v
-            }
-          }
-        }
+        ret = calculateFrame(previousFrame, frame, effects, p)
       }
       break
     }
