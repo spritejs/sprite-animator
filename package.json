@@ -11,6 +11,7 @@
     "lint": "eslint 'src/**/*.js' --fix",
     "start": "webpack-dev-server -d --quiet --port 9090 & http-server example -c-1 -p 9091",
     "build-node": "babel src -d lib --watch",
+    "compile": "babel src -d lib --compile --watch",
     "deploy": "rm -rf dist/* && ./script/deploy.js",
     "prepublishOnly": "babel src -d lib && npm run deploy"
   },
@@ -19,6 +20,7 @@
   "license": "MIT",
   "dependencies": {
     "babel-decorators-runtime": "^0.2.0",
+    "babel-runtime": "^6.26.0",
     "bezier-easing": "^2.0.3",
     "sprite-timeline": "^1.2.1"
   },

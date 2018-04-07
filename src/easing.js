@@ -1,6 +1,63 @@
-import {getBezierEasing, getStepsEasing} from './utils'
+const BezierEasing = require('bezier-easing')
+const bezierFuncCache = new Map()
 
-export default {
+function getBezierEasing(...value) {
+  let easing = bezierFuncCache.get(value)
+  if(easing) {
+    return easing
+  }
+  easing = BezierEasing(...value)
+  bezierFuncCache.set(value, easing)
+  return easing
+}
+
+function getStepsEasing(step, pos = 'end') {
+  return function (p, frames) {
+    for(let i = 1; i < frames.length; i++) {
+      const {offset} = frames[i]
+      if(p <= offset) {
+        const start = frames[i - 1].offset,
+          end = offset
+        const fp = (p - start) / (end - start),
+          d = 1 / step
+
+        let t = fp / d
+        if(pos === 'end') {
+          t = Math.floor(t)
+        } else {
+          t = Math.ceil(t)
+        }
+
+        return (d * t) * (end - start) + start
+      }
+    }
+    return 0
+  }
+}
+
+function parseEasingStr(easingStr) {
+  let pattern = /^cubic-bezier\((.*)\)/,
+    matched = easingStr.match(pattern)
+
+  if(matched) {
+    let value = matched[1].trim()
+    value = value.split(',').map(v => parseFloat(v.trim()))
+    return getBezierEasing(...value)
+  }
+
+  pattern = /^steps\((.*)\)/
+  matched = easingStr.match(pattern)
+
+  if(matched) {
+    let value = matched[1].trim()
+    value = value.split(',').map(v => v.trim())
+    const [step, pos] = value
+    return getStepsEasing(parseInt(step, 10), pos)
+  }
+  return easingStr
+}
+
+const Easings = {
   linear(p) {
     return p
   },
@@ -32,4 +89,25 @@ export default {
   // }
   'step-start': getStepsEasing(1, 'start'),
   'step-end': getStepsEasing(1, 'end'),
+}
+
+function parseEasing(easing) {
+  if(typeof easing === 'string') {
+    if(!Easings[easing]) {
+      easing = parseEasingStr(easing)
+    } else {
+      // load default Easing
+      easing = Easings[easing]
+    }
+  } else if(easing.type === 'cubic-bezier') {
+    easing = getBezierEasing(...easing.value)
+  } else if(easing.type === 'steps') {
+    easing = getStepsEasing(easing.step, easing.pos)
+  }
+  return easing
+}
+
+export {
+  Easings,
+  parseEasing,
 }

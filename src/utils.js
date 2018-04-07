@@ -17,61 +17,36 @@ export function periodicity(val, dur) {
   return val
 }
 
-const BezierEasing = require('bezier-easing')
-const bezierFuncCache = new Map()
+export function calculateFramesOffset(keyframes) {
+  keyframes = keyframes.slice(0)
 
-export function getBezierEasing(...value) {
-  let easing = bezierFuncCache.get(value)
-  if(easing) {
-    return easing
-  }
-  easing = BezierEasing(...value)
-  bezierFuncCache.set(value, easing)
-  return easing
-}
+  const firstFrame = keyframes[0],
+    lastFrame = keyframes[keyframes.length - 1]
 
-export function getStepsEasing(step, pos = 'end') {
-  return function (p, frames) {
-    for(let i = 1; i < frames.length; i++) {
-      const {offset} = frames[i]
-      if(p <= offset) {
-        const start = frames[i - 1].offset,
-          end = offset
-        const fp = (p - start) / (end - start),
-          d = 1 / step
+  lastFrame.offset = lastFrame.offset || 1
+  firstFrame.offset = firstFrame.offset || 0
 
-        let t = fp / d
-        if(pos === 'end') {
-          t = Math.floor(t)
-        } else {
-          t = Math.ceil(t)
+  let offset = 0,
+    offsetFrom = -1
+
+  for(let i = 0; i < keyframes.length; i++) {
+    const frame = keyframes[i]
+    if(frame.offset != null) {
+      const dis = i - offsetFrom
+      if(dis > 1) {
+        const delta = (frame.offset - offset) / (dis)
+        for(let j = 0; j < dis - 1; j++) {
+          keyframes[offsetFrom + j + 1].offset = offset + delta * (j + 1)
         }
-
-        return (d * t) * (end - start) + start
       }
+      offset = frame.offset
+      offsetFrom = i
     }
-    return 0
-  }
-}
-
-export function parseEasingStr(easingStr) {
-  let pattern = /^cubic-bezier\((.*)\)/,
-    matched = easingStr.match(pattern)
-
-  if(matched) {
-    let value = matched[1].trim()
-    value = value.split(',').map(v => parseFloat(v.trim()))
-    return getBezierEasing(...value)
+    if(i > 0) {
+      // 如果中间某个属性没有了，需要从前一帧复制过来
+      keyframes[i] = Object.assign({}, keyframes[i - 1], keyframes[i])
+    }
   }
 
-  pattern = /^steps\((.*)\)/
-  matched = easingStr.match(pattern)
-
-  if(matched) {
-    let value = matched[1].trim()
-    value = value.split(',').map(v => v.trim())
-    const [step, pos] = value
-    return getStepsEasing(parseInt(step, 10), pos)
-  }
-  return easingStr
+  return keyframes
 }
