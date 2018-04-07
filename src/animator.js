@@ -220,12 +220,15 @@ export default class {
     }
   }
 
-  [_removeDefer](deferID) {
+  [_removeDefer](deferID, complete = false) {
     const defered = this[deferID],
       {timeline} = this
 
     if(defered && timeline) {
       timeline.clearTimeout(defered.timerID)
+      if(complete) {
+        defered.resolve()
+      }
     }
     delete this[deferID]
   }
@@ -237,26 +240,9 @@ export default class {
   }
 
   finish() {
-    if(this.playState !== 'idle') {
-      this.timeline.entropy = Infinity
-      if(this[_readyDefer]) {
-        this.timeline.clearTimeout(this[_readyDefer].timerID)
-        delete this[_readyDefer]
-      }
-      if(this[_finishedDefer]) {
-        this.timeline.clearTimeout(this[_finishedDefer].timerID)
-        this[_finishedDefer].resolve()
-        delete this[_finishedDefer]
-      }
-    } else {
-      if(this[_readyDefer]) {
-        delete this[_readyDefer]
-      }
-      if(this[_finishedDefer]) {
-        this[_finishedDefer].resolve()
-        delete this[_finishedDefer]
-      }
-    }
+    this.timeline.entropy = Infinity
+    this[_removeDefer](_readyDefer)
+    this[_removeDefer](_finishedDefer, true)
   }
 
   applyEffects(effects) {
