@@ -196,6 +196,8 @@ export default class {
     const {duration, iterations, endDelay} = this[_timing]
     if(this[_finishedDefer] && !this[_finishedDefer].timerID) {
       this[_finishedDefer].timerID = this.timeline.setTimeout(() => {
+        this.timeline.entropy = Infinity
+        this.timeline.currentTime = duration * iterations + endDelay
         this[_finishedDefer].resolve()
       }, {delay: duration * iterations + endDelay - this.timeline.entropy})
     }
@@ -240,7 +242,9 @@ export default class {
   }
 
   finish() {
+    const {duration, iterations, endDelay} = this[_timing]
     this.timeline.entropy = Infinity
+    this.timeline.currentTime = duration * iterations + endDelay
     this[_removeDefer](_readyDefer)
     this[_removeDefer](_finishedDefer, true)
   }
