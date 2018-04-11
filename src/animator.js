@@ -102,7 +102,7 @@ export default class {
     } else if(timeline.currentTime < 0) { // 开始 pending
       state = 'pending'
     } else {
-      const ed = timeline.entropy - iterations * duration
+      const ed = timeline.currentTime - iterations * duration
       if(ed > 0 && ed < endDelay) { // 结束 pending
         state = 'pending'
       } else if(ed >= endDelay) {
