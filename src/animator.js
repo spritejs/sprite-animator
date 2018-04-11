@@ -188,7 +188,7 @@ export default class {
         this[_readyDefer].resolve()
         assert(this.playState === 'running' || this.playState === 'finished', `An error occured: ${this.playState}`)
         delete this[_readyDefer]
-      }, {entropy: -this.timeline.entropy})
+      }, {delay: -this.timeline.entropy})
     }
   }
 
@@ -197,7 +197,7 @@ export default class {
     if(this[_finishedDefer] && !this[_finishedDefer].timerID) {
       this[_finishedDefer].timerID = this.timeline.setTimeout(() => {
         this[_finishedDefer].resolve()
-      }, {entropy: duration * iterations + endDelay - this.timeline.entropy})
+      }, {delay: duration * iterations + endDelay - this.timeline.entropy})
     }
   }
 
