@@ -41,6 +41,7 @@
   <button id="x1">正常</button>
   <button id="x2">2倍</button>
   <button id="x4">4倍</button>
+  <button id="reverse">-1倍</button>
   <div id="block">idle</div>
   <script src="/js/index.js"></script>
   <script>
@@ -128,7 +129,7 @@
         cancelAnimationFrame(requestID)
       }
       animation.cancel()
-
+      animation.playbackRate = 1.0
       requestID = requestAnimationFrame(async function update(){
         const frame = animation.frame
 
@@ -143,6 +144,9 @@
         if(animation.playState === 'pending'){
           block.innerHTML = 'pending'
           await animation.finished
+          const frame = animation.frame
+          block.style.width = frame.width
+          block.style.backgroundColor = frame.backgroundColor          
         }
 
         if(animation.playState !== 'finished' && animation.playState !== 'idle') {
@@ -204,6 +208,9 @@
     }
     x4.onclick = function(){
       animation.playbackRate = 4.0
+    }
+    reverse.onclick = function(){
+      animation.playbackRate = -1
     }
   </script>
 </body>

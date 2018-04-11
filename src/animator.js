@@ -99,7 +99,7 @@ export default class {
       state = 'idle'
     } else if(timeline.playbackRate === 0) {
       state = 'paused'
-    } else if(timeline.entropy < 0) { // 开始 pending
+    } else if(timeline.currentTime < 0) { // 开始 pending
       state = 'pending'
     } else {
       const ed = timeline.entropy - iterations * duration
@@ -196,10 +196,11 @@ export default class {
     const {duration, iterations, endDelay} = this[_timing]
     if(this[_finishedDefer] && !this[_finishedDefer].timerID) {
       this[_finishedDefer].timerID = this.timeline.setTimeout(() => {
-        this.timeline.entropy = Infinity
-        this.timeline.currentTime = duration * iterations + endDelay
         this[_finishedDefer].resolve()
-      }, {delay: duration * iterations + endDelay - this.timeline.entropy})
+        if(this.timeline.currentTime < 0) {
+          this.cancel()
+        }
+      }, {delay: duration * iterations + endDelay - this.timeline.currentTime})
     }
   }
 
@@ -209,6 +210,9 @@ export default class {
     }
 
     if(this.playState === 'idle') {
+      if(this.playbackRate <= 0) {
+        return
+      }
       const {delay, playbackRate, timeline} = this[_timing]
       this.timeline = new Timeline({
         originTime: delay,
@@ -242,9 +246,8 @@ export default class {
   }
 
   finish() {
-    const {duration, iterations, endDelay} = this[_timing]
     this.timeline.entropy = Infinity
-    this.timeline.currentTime = duration * iterations + endDelay
+    this.timeline.currentTime = Infinity
     this[_removeDefer](_readyDefer)
     this[_removeDefer](_finishedDefer, true)
   }
