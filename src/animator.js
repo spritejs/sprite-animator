@@ -84,7 +84,7 @@ export default class {
   }
 
   set playbackRate(rate) {
-    if(this.timeline && this.playState !== 'paused') {
+    if(this.timeline) {
       this.timeline.playbackRate = rate
     }
     this[_timing].playbackRate = rate
