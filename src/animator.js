@@ -151,13 +151,13 @@ export default class {
       return initState
     }
 
-    const {entropy} = this.timeline,
+    const {currentTime} = this.timeline,
       keyframes = this[_keyframes].slice(0)
 
     const {p, inverted} = getProgress(this.timeline, this[_timing], this.progress)
 
     let frameState = initState
-    if(entropy < 0 && playState === 'pending') {
+    if(currentTime < 0 && playState === 'pending') {
       // 在开始前 delay 阶段
       if(fill === 'backwards' || fill === 'both') {
         frameState = inverted ? keyframes[keyframes.length - 1] : keyframes[0]
