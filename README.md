@@ -18,7 +18,7 @@ npm install sprite-animator
 in browser
 
 ```html
-<script src="https://s0.ssl.qhres.com/!447e0c82/sprite-animator-1.3.6.js"></script>
+<script src="https://s0.ssl.qhres.com/!20ecb35a/sprite-animator-1.4.0.js"></script>
 ```
 
 ## Lincense

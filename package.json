@@ -21,7 +21,7 @@
   "dependencies": {
     "babel-runtime": "^6.26.0",
     "bezier-easing": "^2.0.3",
-    "sprite-timeline": "^1.5.0"
+    "sprite-timeline": "^1.5.1"
   },
   "devDependencies": {
     "ava": "^0.21.0",

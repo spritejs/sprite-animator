@@ -95,16 +95,9 @@ export default class {
       {iterations, duration, endDelay} = this[_timing]
     let state = 'running'
 
-    let paused = timeline.playbackRate === 0
-    let parent = timeline.parent
-    while(!paused && parent) {
-      paused = parent.playbackRate === 0
-      parent = parent.parent
-    }
-
     if(timeline == null) {
       state = 'idle'
-    } else if(paused) {
+    } else if(timeline.paused) {
       state = 'paused'
     } else if(timeline.currentTime < 0) { // 开始 pending
       state = 'pending'
