@@ -206,7 +206,7 @@ export default class {
       this[_finishedDefer].timerID = this.timeline.setAlarm(time, () => {
         this[_finishedDefer].resolve()
         this.timeline.clearAlarm(this[_finishedDefer].timerID)
-      })
+      }, false)
       // this[_finishedDefer].timerID = this.timeline.setTimeout(() => {
       //   this[_finishedDefer].resolve()
       //   if(this.timeline.currentTime < 0) {
