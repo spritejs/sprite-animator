@@ -185,9 +185,11 @@ export default class {
   [_activeReadyTimer](time = 0) {
     if(this[_readyDefer] && !this[_readyDefer].timerID) {
       this[_readyDefer].timerID = this.timeline.setAlarm(time, () => {
-        this[_readyDefer].resolve()
-        this.timeline.clearAlarm(this[_readyDefer].timerID)
-        delete this[_readyDefer]
+        if(this.timeline.currentTime >= 0) {
+          this[_readyDefer].resolve()
+          this.timeline.clearAlarm(this[_readyDefer].timerID)
+          delete this[_readyDefer]
+        }
       })
       // this[_readyDefer].timerID = this.timeline.setTimeout(() => {
       //   this[_readyDefer].resolve()
@@ -281,7 +283,10 @@ export default class {
     if(this.timeline) { // 已经在 pending 状态
       this[_activeReadyTimer](Math.max(this.timeline.currentTime, 0))
     }
-    return this[_readyDefer].promise
+    if(this[_readyDefer]) {
+      return this[_readyDefer].promise
+    }
+    return Promise.resolve()
   }
 
   get finished() {
