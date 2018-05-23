@@ -184,23 +184,33 @@ export default class {
 
   [_activeReadyTimer]() {
     if(this[_readyDefer] && !this[_readyDefer].timerID) {
-      this[_readyDefer].timerID = this.timeline.setTimeout(() => {
+      this[_readyDefer].timerID = this.timeline.setAlarm(0, () => {
         this[_readyDefer].resolve()
-        assert(this.playState === 'running' || this.playState === 'finished', `An error occured: ${this.playState}`)
+        this.timeline.clearAlarm(this[_readyDefer].timerID)
         delete this[_readyDefer]
-      }, {delay: -this.timeline.entropy})
+      })
+      // this[_readyDefer].timerID = this.timeline.setTimeout(() => {
+      //   this[_readyDefer].resolve()
+      //   assert(this.playState === 'running' || this.playState === 'finished', `An error occured: ${this.playState}`)
+      //   delete this[_readyDefer]
+      // }, {delay: -this.timeline.entropy})
     }
   }
 
   [_activeFinishTimer]() {
     const {duration, iterations, endDelay} = this[_timing]
+    const time = duration * iterations + endDelay
     if(this[_finishedDefer] && !this[_finishedDefer].timerID) {
-      this[_finishedDefer].timerID = this.timeline.setTimeout(() => {
+      this[_finishedDefer].timerID = this.timeline.setAlarm(time, () => {
         this[_finishedDefer].resolve()
-        if(this.timeline.currentTime < 0) {
-          this.cancel()
-        }
-      }, {delay: duration * iterations + endDelay - this.timeline.currentTime})
+        this.timeline.clearAlarm(this[_finishedDefer].timerID)
+      })
+      // this[_finishedDefer].timerID = this.timeline.setTimeout(() => {
+      //   this[_finishedDefer].resolve()
+      //   if(this.timeline.currentTime < 0) {
+      //     this.cancel()
+      //   }
+      // }, {delay: duration * iterations + endDelay - this.timeline.currentTime})
     }
   }
 
@@ -231,7 +241,7 @@ export default class {
       {timeline} = this
 
     if(defered && timeline) {
-      timeline.clearTimeout(defered.timerID)
+      timeline.clearAlarm(defered.timerID)
       if(complete) {
         defered.resolve()
       }
