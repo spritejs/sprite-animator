@@ -95,9 +95,16 @@ export default class {
       {iterations, duration, endDelay} = this[_timing]
     let state = 'running'
 
+    let paused = timeline.playbackRate === 0
+    let parent = timeline.parent
+    while(!paused && parent) {
+      paused = parent.playbackRate === 0
+      parent = parent.parent
+    }
+
     if(timeline == null) {
       state = 'idle'
-    } else if(timeline.playbackRate === 0) {
+    } else if(paused) {
       state = 'paused'
     } else if(timeline.currentTime < 0) { // 开始 pending
       state = 'pending'
@@ -182,9 +189,9 @@ export default class {
     return this[_timing].timeline
   }
 
-  [_activeReadyTimer]() {
+  [_activeReadyTimer](time = 0) {
     if(this[_readyDefer] && !this[_readyDefer].timerID) {
-      this[_readyDefer].timerID = this.timeline.setAlarm(0, () => {
+      this[_readyDefer].timerID = this.timeline.setAlarm(time, () => {
         this[_readyDefer].resolve()
         this.timeline.clearAlarm(this[_readyDefer].timerID)
         delete this[_readyDefer]
@@ -271,19 +278,16 @@ export default class {
       return this[_readyDefer].promise
     }
 
-    if(this.timeline && this.timeline.entropy >= 0) {
+    if(this.timeline && this.timeline.currentTime >= 0) {
       if(this.playState !== 'paused') {
         return Promise.resolve()
       }
-      this[_readyDefer] = defer()
-      return this[_readyDefer].promise
     }
+
     this[_readyDefer] = defer()
-
     if(this.timeline) { // 已经在 pending 状态
-      this[_activeReadyTimer]()
+      this[_activeReadyTimer](Math.max(this.timeline.currentTime, 0))
     }
-
     return this[_readyDefer].promise
   }
 
