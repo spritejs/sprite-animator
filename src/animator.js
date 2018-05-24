@@ -185,7 +185,7 @@ export default class {
       this[_readyDefer].timerID = this.timeline.setTimeout(() => {
         this[_readyDefer].resolve()
         delete this[_readyDefer]
-      }, {delay: Math.max(-this.timeline.currentTime, 0), heading: false})
+      }, {delay: Math.max(-this.timeline.currentTime, 0), heading: this.timeline.paused})
     }
   }
 
