@@ -3,8 +3,6 @@ import {defer, periodicity, calculateFramesOffset, getProgress, getCurrentFrame}
 import Timeline from 'sprite-timeline'
 import {parseEasing} from './easing'
 
-const assert = require('assert')
-
 const _timing = Symbol('timing'),
   _keyframes = Symbol('keyframes'),
   _initState = Symbol('initState'),
@@ -182,37 +180,22 @@ export default class {
     return this[_timing].timeline
   }
 
-  [_activeReadyTimer](time = 0) {
+  [_activeReadyTimer]() {
     if(this[_readyDefer] && !this[_readyDefer].timerID) {
-      this[_readyDefer].timerID = this.timeline.setAlarm(time, () => {
-        if(this.timeline.currentTime >= 0) {
-          this[_readyDefer].resolve()
-          this.timeline.clearAlarm(this[_readyDefer].timerID)
-          delete this[_readyDefer]
-        }
-      })
-      // this[_readyDefer].timerID = this.timeline.setTimeout(() => {
-      //   this[_readyDefer].resolve()
-      //   assert(this.playState === 'running' || this.playState === 'finished', `An error occured: ${this.playState}`)
-      //   delete this[_readyDefer]
-      // }, {delay: -this.timeline.entropy})
+      this[_readyDefer].timerID = this.timeline.setTimeout(() => {
+        this[_readyDefer].resolve()
+        delete this[_readyDefer]
+      }, {delay: Math.max(-this.timeline.currentTime, 0), heading: false})
     }
   }
 
   [_activeFinishTimer]() {
     const {duration, iterations, endDelay} = this[_timing]
-    const time = duration * iterations + endDelay
+    const delay = duration * iterations + endDelay
     if(this[_finishedDefer] && !this[_finishedDefer].timerID) {
-      this[_finishedDefer].timerID = this.timeline.setAlarm(time, () => {
+      this[_finishedDefer].timerID = this.timeline.setTimeout(() => {
         this[_finishedDefer].resolve()
-        this.timeline.clearAlarm(this[_finishedDefer].timerID)
-      }, false)
-      // this[_finishedDefer].timerID = this.timeline.setTimeout(() => {
-      //   this[_finishedDefer].resolve()
-      //   if(this.timeline.currentTime < 0) {
-      //     this.cancel()
-      //   }
-      // }, {delay: duration * iterations + endDelay - this.timeline.currentTime})
+      }, {delay: delay - this.timeline.currentTime, heading: false})
     }
   }
 
@@ -243,7 +226,7 @@ export default class {
       {timeline} = this
 
     if(defered && timeline) {
-      timeline.clearAlarm(defered.timerID)
+      timeline.clearTimeout(defered.timerID)
       if(complete) {
         defered.resolve()
       }
@@ -281,7 +264,7 @@ export default class {
 
     this[_readyDefer] = defer()
     if(this.timeline) { // 已经在 pending 状态
-      this[_activeReadyTimer](Math.max(this.timeline.currentTime, 0))
+      this[_activeReadyTimer]()
     }
     if(this[_readyDefer]) {
       return this[_readyDefer].promise
