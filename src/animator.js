@@ -64,6 +64,11 @@ export default class {
       }
     })
 
+    // 补齐参数
+    this[_keyframes] = this[_keyframes].map((frame) => {
+      return Object.assign({}, this[_initState], frame)
+    })
+
     if(this[_keyframes][0].offset !== 0) {
       // 要补第一帧
       this[_keyframes].unshift(Object.assign({}, this[_initState], {offset: 0}))
