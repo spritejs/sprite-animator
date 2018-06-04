@@ -111,19 +111,20 @@ export default class {
   }
 
   get progress() {
+    if(!this.timeline) return 0
+
     const {duration, iterations} = this[_timing]
     const timeline = this.timeline,
-      entropy = timeline ? timeline.entropy : 0,
       playState = this.playState
 
     let p
 
     if(playState === 'idle') {
       p = 0
-    } else if(playState === 'paused' && entropy < 0) {
+    } else if(playState === 'paused' && timeline.currentTime < 0) {
       p = 0
     } else if(playState === 'pending') {
-      if(entropy < 0) {
+      if(timeline.currentTime < 0) {
         p = 0
       } else {
         const time = timeline.seekLocalTime(iterations * duration)
@@ -182,10 +183,17 @@ export default class {
 
   [_activeReadyTimer]() {
     if(this[_readyDefer] && !this[_readyDefer].timerID) {
-      this[_readyDefer].timerID = this.timeline.setTimeout(() => {
-        this[_readyDefer].resolve()
-        delete this[_readyDefer]
-      }, {delay: Math.max(-this.timeline.currentTime, 0), heading: this.timeline.paused})
+      if(this.timeline.currentTime < 0) {
+        this[_readyDefer].timerID = this.timeline.setTimeout(() => {
+          this[_readyDefer].resolve()
+          delete this[_readyDefer]
+        }, {delay: -this.timeline.currentTime, heading: false})
+      } else {
+        this[_readyDefer].timerID = this.timeline.setTimeout(() => {
+          this[_readyDefer].resolve()
+          delete this[_readyDefer]
+        }, {delay: 0, isEntropy: true})
+      }
     }
   }
 
@@ -241,7 +249,6 @@ export default class {
   }
 
   finish() {
-    this.timeline.entropy = Infinity
     this.timeline.currentTime = Infinity
     this[_removeDefer](_readyDefer)
     this[_removeDefer](_finishedDefer, true)
