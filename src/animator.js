@@ -204,11 +204,11 @@ export default class {
 
   [_activeFinishTimer]() {
     const {duration, iterations, endDelay} = this[_timing]
-    const delay = duration * iterations + endDelay
+    const delay = Math.ceil(duration * iterations + endDelay - this.timeline.currentTime)
     if(this[_finishedDefer] && !this[_finishedDefer].timerID) {
       this[_finishedDefer].timerID = this.timeline.setTimeout(() => {
         this[_finishedDefer].resolve()
-      }, {delay: delay - this.timeline.currentTime, heading: false})
+      }, {delay, heading: false})
     }
   }
 
