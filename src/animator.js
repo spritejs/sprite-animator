@@ -204,7 +204,7 @@ export default class {
 
   [_activeFinishTimer]() {
     const {duration, iterations, endDelay} = this[_timing]
-    const delay = Math.ceil(duration * iterations + endDelay - this.timeline.currentTime)
+    const delay = Math.ceil(duration * iterations + endDelay - this.timeline.currentTime) + 1
     if(this[_finishedDefer] && !this[_finishedDefer].timerID) {
       this[_finishedDefer].timerID = this.timeline.setTimeout(() => {
         this[_finishedDefer].resolve()
