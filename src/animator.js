@@ -234,15 +234,12 @@ export default class {
     }
   }
 
-  [_removeDefer](deferID, complete = false) {
+  [_removeDefer](deferID) {
     const defered = this[deferID],
       {timeline} = this
 
     if(defered && timeline) {
       timeline.clearTimeout(defered.timerID)
-      if(complete) {
-        defered.resolve()
-      }
     }
     delete this[deferID]
   }
@@ -256,7 +253,7 @@ export default class {
   finish() {
     this.timeline.currentTime = Infinity
     this[_removeDefer](_readyDefer)
-    this[_removeDefer](_finishedDefer, true)
+    this[_removeDefer](_finishedDefer)
   }
 
   applyEffects(effects) {
