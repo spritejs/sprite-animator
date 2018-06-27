@@ -209,6 +209,9 @@ export default class {
       this[_finishedDefer].timerID = this.timeline.setTimeout(() => {
         this[_finishedDefer].resolve()
       }, {delay, heading: false})
+      this[_finishedDefer].reverseTimerID = this.timeline.setTimeout(() => {
+        this[_finishedDefer].resolve()
+      }, {delay: -this[_timing].delay, heading: false})
     }
   }
 
@@ -240,6 +243,9 @@ export default class {
 
     if(defered && timeline) {
       timeline.clearTimeout(defered.timerID)
+      if(defered.reverseTimerID) {
+        timeline.clearTimeout(defered.reverseTimerID)
+      }
     }
     delete this[deferID]
   }

@@ -143,7 +143,7 @@
 
         if(animation.playState === 'pending'){
           block.innerHTML = 'pending'
-          await animation.finished
+          // await animation.finished
           const frame = animation.frame
           block.style.width = frame.width
           block.style.backgroundColor = frame.backgroundColor          
@@ -210,7 +210,8 @@
       animation.playbackRate = 4.0
     }
     reverse.onclick = function(){
-      animation.playbackRate = -1
+      // animation.playbackRate = -1
+      animation.reverse()
     }
   </script>
 </body>

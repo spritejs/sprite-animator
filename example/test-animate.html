@@ -21,6 +21,7 @@
   <button id="cancelBtn">取消</button>
   <button id="pauseBtn">暂停</button>
   <button id="playBtn">继续</button>
+  <button id="reverseBtn">反转</button>
   <div id = "block"/>
   <script>
     const frames = [
@@ -70,6 +71,10 @@
 
     pauseBtn.onclick = function(){
       anim && anim.pause()
+    }
+
+    reverseBtn.onclick = function() {
+      anim && anim.reverse()
     }
   </script>
 </body>
