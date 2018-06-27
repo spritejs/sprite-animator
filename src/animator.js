@@ -174,6 +174,10 @@ export default class {
     return frameState
   }
 
+  get timing() {
+    return this[_timing]
+  }
+
   pause() {
     this.timeline.playbackRate = 0
   }
