@@ -215,6 +215,7 @@ export default class {
       }, {delay, heading: false})
       this[_finishedDefer].reverseTimerID = this.timeline.setTimeout(() => {
         this[_finishedDefer].resolve()
+        this.timeline = null
       }, {delay: -this[_timing].delay - 1, heading: false})
     }
   }
