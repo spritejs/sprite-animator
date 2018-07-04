@@ -212,9 +212,13 @@ export default class {
     if(this[_finishedDefer] && !this[_finishedDefer].timerID) {
       this[_finishedDefer].timerID = this.timeline.setTimeout(() => {
         this[_finishedDefer].resolve()
+        this[_removeDefer](_readyDefer)
+        this[_removeDefer](_finishedDefer)
       }, {delay, heading: false})
       this[_finishedDefer].reverseTimerID = this.timeline.setTimeout(() => {
         this[_finishedDefer].resolve()
+        this[_removeDefer](_readyDefer)
+        this[_removeDefer](_finishedDefer)
         this.timeline = null
       }, {delay: -this[_timing].delay - 1, heading: false})
     }
