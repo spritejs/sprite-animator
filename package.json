@@ -18,6 +18,9 @@
   "keywords": [],
   "author": "",
   "license": "MIT",
+  "browser": {
+    "./lib/index.js": "src/index.js"
+  },
   "dependencies": {
     "babel-runtime": "^6.26.0",
     "bezier-easing": "^2.0.3",
