@@ -1,37 +1,37 @@
 {
   "name": "sprite-animator",
-  "version": "1.8.5",
+  "version": "1.9.0",
   "description": "Abstract animation generators.",
   "main": "lib/index.js",
+  "esnext": {
+    "./lib/index.js": "src/index.js"
+  },
   "directories": {
     "example": "example"
   },
   "scripts": {
     "test": "nyc ava  --serial && rm -rf ./coverage && mkdir ./coverage && nyc report --reporter=text-lcov > ./coverage/lcov.info",
     "lint": "eslint 'src/**/*.js' --fix",
-    "start": "webpack-dev-server -d --quiet --port 9090 & http-server example -c-1 -p 9091",
+    "start": "webpack-dev-server --watch-poll",
     "build-node": "babel src -d lib --watch",
     "compile": "babel src -d lib --compile --watch",
-    "deploy": "rm -rf dist/* && ./script/deploy.js",
-    "prepublishOnly": "babel src -d lib && npm run deploy"
+    "build": "rm -rf dist/* && ./script/build.js",
+    "prepublishOnly": "babel src -d lib && npm run build"
   },
   "keywords": [],
   "author": "",
   "license": "MIT",
-  "browser": {
-    "./lib/index.js": "src/index.js"
-  },
   "dependencies": {
     "babel-runtime": "^6.26.0",
     "bezier-easing": "^2.0.3",
-    "sprite-timeline": "^1.8.3"
+    "sprite-timeline": "^1.9.0"
   },
   "devDependencies": {
     "ava": "^0.21.0",
     "babel-cli": "^6.26.0",
     "babel-core": "^6.24.0",
     "babel-eslint": "^7.2.3",
-    "babel-loader": "^6.4.1",
+    "babel-loader": "^7.1.5",
     "babel-plugin-transform-class-properties": "^6.24.1",
     "babel-plugin-transform-runtime": "^6.23.0",
     "babel-preset-env": "^1.3.2",
@@ -41,10 +41,10 @@
     "eslint-config-airbnb-base": "^11.2.0",
     "eslint-plugin-import": "^2.2.0",
     "eslint-plugin-vue": "^2.1.0",
-    "http-server": "^0.11.1",
     "nyc": "^11.1.0",
-    "webpack": "^2.3.3",
-    "webpack-dev-server": "^2.4.2"
+    "webpack": "^4.16.1",
+    "webpack-cli": "^3.1.0",
+    "webpack-dev-server": "^3.1.5"
   },
   "ava": {
     "require": [

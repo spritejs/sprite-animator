@@ -43,7 +43,7 @@
   <button id="x4">4倍</button>
   <button id="reverse">-1倍</button>
   <div id="block">idle</div>
-  <script src="/js/index.js"></script>
+  <script src="/js/sprite-animator.js"></script>
   <script>
 
     const colorMap = {}
@@ -71,7 +71,7 @@
       return colorStr
     }
 
-    const animation = new spriteAnimator.Animator(
+    const animation = new SpriteAnimator.Animator(
         {width: '100px', backgroundColor: 'grey'},
         [
          {width: '50px', backgroundColor: 'grey'},
