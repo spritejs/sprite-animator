@@ -4066,7 +4066,7 @@ function getProgress(timeline, timing, p) {
 function calculateFrame(previousFrame, nextFrame, effects, p) {
   const ret = {};
   for (const [key, value] of babel_runtime_core_js_object_entries__WEBPACK_IMPORTED_MODULE_0___default()(nextFrame)) {
-    if (key !== 'offset') {
+    if (key !== 'offset' && key !== 'easing') {
       const effect = effects[key] || effects.default;
 
       const v = effect(previousFrame[key], value, p, previousFrame.offset, nextFrame.offset);
@@ -4097,12 +4097,19 @@ function getCurrentFrame(timing, keyframes, effects, p) {
 
     if (offset >= p || i === keyframes.length - 1) {
       const previousFrame = keyframes[i - 1],
-            previousOffset = previousFrame.offset;
+            previousOffset = previousFrame.offset,
+            easing = previousFrame.easing;
+
+      let ep = p;
+      if (easing) {
+        const d = offset - previousOffset;
+        ep = easing((p - previousOffset) / d) * d + previousOffset;
+      }
 
       if (effect) {
-        ret = effect(previousFrame, frame, p, previousOffset, offset);
+        ret = effect(previousFrame, frame, ep, previousOffset, offset);
       } else {
-        ret = calculateFrame(previousFrame, frame, effects, p);
+        ret = calculateFrame(previousFrame, frame, effects, ep);
       }
       break;
     }
