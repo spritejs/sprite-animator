@@ -1,3 +1,4 @@
+import {parseEasing} from './easing'
 
 export function defer() {
   const ret = {}
@@ -42,6 +43,9 @@ export function calculateFramesOffset(keyframes) {
       }
       offset = frame.offset
       offsetFrom = i
+    }
+    if(frame.easing != null) {
+      frame.easing = parseEasing(frame.easing)
     }
     if(i > 0) {
       // 如果中间某个属性没有了，需要从前一帧复制过来

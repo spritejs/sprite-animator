@@ -4519,6 +4519,8 @@ exports.calculateFramesOffset = calculateFramesOffset;
 exports.getProgress = getProgress;
 exports.getCurrentFrame = getCurrentFrame;
 
+var _easing2 = __webpack_require__(115);
+
 var _effect = __webpack_require__(1);
 
 var _effect2 = _interopRequireDefault(_effect);
@@ -4568,6 +4570,9 @@ function calculateFramesOffset(keyframes) {
       }
       offset = frame.offset;
       offsetFrom = i;
+    }
+    if (frame.easing != null) {
+      frame.easing = (0, _easing2.parseEasing)(frame.easing);
     }
     if (i > 0) {
       // 如果中间某个属性没有了，需要从前一帧复制过来

@@ -3982,7 +3982,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var babel_runtime_core_js_object_assign__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(babel_runtime_core_js_object_assign__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var babel_runtime_core_js_promise__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(101);
 /* harmony import */ var babel_runtime_core_js_promise__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(babel_runtime_core_js_promise__WEBPACK_IMPORTED_MODULE_2__);
-/* harmony import */ var _effect__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(1);
+/* harmony import */ var _easing__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(98);
+/* harmony import */ var _effect__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(1);
+
 
 
 
@@ -4030,6 +4032,9 @@ function calculateFramesOffset(keyframes) {
       }
       offset = frame.offset;
       offsetFrom = i;
+    }
+    if (frame.easing != null) {
+      frame.easing = Object(_easing__WEBPACK_IMPORTED_MODULE_3__["parseEasing"])(frame.easing);
     }
     if (i > 0) {
       // 如果中间某个属性没有了，需要从前一帧复制过来
@@ -4084,7 +4089,7 @@ function getCurrentFrame(timing, keyframes, effects, p) {
 
   if (!effect) {
     // timing.effect 会覆盖掉 Effects 和 animator.applyEffects 中定义的 effects
-    effects = babel_runtime_core_js_object_assign__WEBPACK_IMPORTED_MODULE_1___default()({}, effects, _effect__WEBPACK_IMPORTED_MODULE_3__["default"]);
+    effects = babel_runtime_core_js_object_assign__WEBPACK_IMPORTED_MODULE_1___default()({}, effects, _effect__WEBPACK_IMPORTED_MODULE_4__["default"]);
   }
 
   let ret = {};
