@@ -48,8 +48,12 @@ export function calculateFramesOffset(keyframes) {
       frame.easing = parseEasing(frame.easing)
     }
     if(i > 0) {
+      const hasEasing = keyframes[i].easing != null
       // 如果中间某个属性没有了，需要从前一帧复制过来
       keyframes[i] = Object.assign({}, keyframes[i - 1], keyframes[i])
+      if(!hasEasing) { // easing 不能复制
+        delete keyframes[i].easing
+      }
     }
   }
 

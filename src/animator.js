@@ -60,7 +60,9 @@ export default class {
 
     Object.keys(lastFrame).forEach((key) => {
       if(Object.prototype.hasOwnProperty.call(initState, key)) {
-        this[_initState][key] = initState[key]
+        if(key !== 'easing' && key !== 'offset') {
+          this[_initState][key] = initState[key]
+        }
       }
     })
 
