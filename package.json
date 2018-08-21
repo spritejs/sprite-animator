@@ -1,6 +1,6 @@
 {
   "name": "sprite-animator",
-  "version": "1.10.3",
+  "version": "1.10.4",
   "description": "Abstract animation generators.",
   "main": "lib/index.js",
   "esnext": {
