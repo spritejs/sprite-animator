@@ -62,9 +62,8 @@ export function calculateFramesOffset(keyframes) {
   return keyframes;
 }
 
-export function getProgress(timeline, timing, p) {
-  const {currentTime} = timeline,
-    {direction, duration} = timing;
+export function getProgress(currentTime, timing, p) {
+  const {direction, duration} = timing;
   let inverted = false;
   if(direction === 'reverse') {
     p = 1 - p;
