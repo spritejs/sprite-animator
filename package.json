@@ -1,6 +1,6 @@
 {
   "name": "sprite-animator",
-  "version": "1.10.4",
+  "version": "1.11.0",
   "description": "Abstract animation generators.",
   "main": "lib/index.js",
   "esnext": {
@@ -24,7 +24,7 @@
   "dependencies": {
     "babel-runtime": "^6.26.0",
     "bezier-easing": "^2.0.3",
-    "sprite-timeline": "^1.9.2"
+    "sprite-timeline": "^1.10.0"
   },
   "devDependencies": {
     "ava": "^0.21.0",
