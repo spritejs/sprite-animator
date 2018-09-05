@@ -3030,7 +3030,9 @@ const defaultTiming = {
   }
 
   finish() {
-    this.timeline.currentTime = Infinity / this.playbackRate;
+    if (this.timeline) {
+      this.timeline.currentTime = Infinity / this.playbackRate;
+    }
     this[_removeDefer](_readyDefer);
     this[_removeDefer](_finishedDefer);
   }
