@@ -229,7 +229,7 @@ class Timeline {
 
       if (!isEntropy) {
         const endTime = startTime + delay;
-        if (delay === 0 || heading !== false && (to - from) * delay < 0 || from < endTime && endTime < to || from > endTime && endTime > to) {
+        if (delay === 0 || heading !== false && (to - from) * delay <= 0 || from <= endTime && endTime <= to || from >= endTime && endTime >= to) {
           handler();
           this.clearTimeout(id);
         }
