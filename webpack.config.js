@@ -47,6 +47,9 @@ module.exports = function (env = {}) {
     },
     resolve: {
       aliasFields,
+      alias: {
+        'sprite-timeline': 'sprite-timeline/src/index',
+      },
     },
     externals,
     // Don't follow/bundle these modules, but request them at runtime from the environment
