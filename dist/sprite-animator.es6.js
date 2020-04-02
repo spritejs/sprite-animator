@@ -2943,6 +2943,10 @@ const defaultTiming = {
     return this[_timing];
   }
 
+  get effects() {
+    return this[_effects];
+  }
+
   pause() {
     this.timeline.playbackRate = 0;
   }
@@ -3908,7 +3912,7 @@ function getCurrentFrame(timing, keyframes, effects, p) {
 
   if (!effect) {
     // timing.effect 会覆盖掉 Effects 和 animator.applyEffects 中定义的 effects
-    effects = babel_runtime_core_js_object_assign__WEBPACK_IMPORTED_MODULE_1___default()({}, effects, _effect__WEBPACK_IMPORTED_MODULE_4__["default"]);
+    effects = babel_runtime_core_js_object_assign__WEBPACK_IMPORTED_MODULE_1___default()({}, _effect__WEBPACK_IMPORTED_MODULE_4__["default"], effects);
   }
 
   let ret = {};

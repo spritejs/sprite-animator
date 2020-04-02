@@ -104,7 +104,7 @@ export function getCurrentFrame(timing, keyframes, effects, p) {
 
   if(!effect) {
     // timing.effect 会覆盖掉 Effects 和 animator.applyEffects 中定义的 effects
-    effects = Object.assign({}, effects, Effects);
+    effects = Object.assign({}, Effects, effects);
   }
 
   let ret = {};

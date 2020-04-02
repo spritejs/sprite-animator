@@ -180,6 +180,10 @@ export default class {
     return this[_timing];
   }
 
+  get effects() {
+    return this[_effects];
+  }
+
   pause() {
     this.timeline.playbackRate = 0;
   }
