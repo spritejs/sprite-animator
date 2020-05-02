@@ -117,6 +117,29 @@ export default class {
     return state;
   }
 
+  getPlayState(ntime) {
+    const timeline = this.timeline,
+      {iterations, duration, endDelay} = this[_timing];
+    let state = 'running';
+
+    if(timeline == null) {
+      state = 'idle';
+    } else if(timeline.paused) {
+      state = 'paused';
+    } else if(timeline.getCurrentTime(ntime) < 0) { // 开始 pending
+      state = 'pending';
+    } else {
+      const ed = timeline.getCurrentTime(ntime) - iterations * duration;
+      if(ed > 0 && ed < endDelay) { // 结束 pending
+        state = 'pending';
+      } else if(ed >= endDelay) {
+        state = 'finished';
+      }
+    }
+    return state;
+  }
+
+
   get progress() {
     if(!this.timeline) return 0;
 
@@ -148,6 +171,37 @@ export default class {
     return p;
   }
 
+  getProgress(ntime) {
+    if(!this.timeline) return 0;
+
+    const {duration, iterations} = this[_timing];
+    const timeline = this.timeline,
+      playState = this.getPlayState(ntime);
+
+    let p;
+
+    if(playState === 'idle') {
+      p = 0;
+    } else if(playState === 'paused' && timeline.getCurrentTime(ntime) < 0) {
+      p = 0;
+    } else if(playState === 'pending') {
+      if(timeline.getCurrentTime(ntime) < 0) {
+        p = 0;
+      } else {
+        const time = timeline.seekLocalTime(iterations * duration);
+        p = periodicity(time, duration)[1] / duration;
+      }
+    } else if(playState === 'running' || playState === 'paused') {
+      p = periodicity(timeline.getCurrentTime(ntime), duration)[1] / duration;
+    }
+
+    if(playState === 'finished') {
+      p = periodicity(iterations, 1)[1];
+    }
+
+    return p;
+  }
+
   get frame() {
     const playState = this.playState,
       initState = this[_initState],
@@ -160,7 +214,35 @@ export default class {
     const {currentTime} = this.timeline,
       keyframes = this[_keyframes].slice(0);
 
-    const {p, inverted} = getProgress(this.timeline, this[_timing], this.progress);
+    const {p, inverted} = getProgress(currentTime, this[_timing], this.progress);
+
+    let frameState = initState;
+    if(currentTime < 0 && playState === 'pending') {
+      // 在开始前 delay 阶段
+      if(fill === 'backwards' || fill === 'both') {
+        frameState = inverted ? keyframes[keyframes.length - 1] : keyframes[0];
+      }
+    } else if((playState !== 'pending' && playState !== 'finished')
+      || fill === 'forwards' || fill === 'both') {
+      // 不在 endDelay 或结束状态，或 forwards
+      frameState = getCurrentFrame(this[_timing], keyframes, this[_effects], p);
+    }
+    return frameState;
+  }
+
+  getFrame(ntime) {
+    const playState = this.getPlayState(ntime),
+      initState = this[_initState],
+      {fill} = this[_timing];
+
+    if(playState === 'idle') {
+      return initState;
+    }
+
+    const currentTime = this.timeline.getCurrentTime(ntime),
+      keyframes = this[_keyframes].slice(0);
+
+    const {p, inverted} = getProgress(currentTime, this[_timing], this.getProgress(ntime));
 
     let frameState = initState;
     if(currentTime < 0 && playState === 'pending') {
@@ -196,13 +278,14 @@ export default class {
     return this[_timing].timeline;
   }
 
-  [_activeReadyTimer]() {
+  [_activeReadyTimer](ntime) {
     if(this[_readyDefer] && !this[_readyDefer].timerID) {
-      if(this.timeline.currentTime < 0) {
+      var currentTime = this.timeline.getCurrentTime(ntime);
+      if(currentTime < 0) {
         this[_readyDefer].timerID = this.timeline.setTimeout(() => {
           this[_readyDefer].resolve();
           delete this[_readyDefer];
-        }, {delay: -this.timeline.currentTime, heading: false});
+        }, {delay: -currentTime, heading: false});
       } else {
         this[_readyDefer].timerID = this.timeline.setTimeout(() => {
           this[_readyDefer].resolve();
@@ -212,9 +295,9 @@ export default class {
     }
   }
 
-  [_activeFinishTimer]() {
+  [_activeFinishTimer](ntime) {
     const {duration, iterations, endDelay} = this[_timing];
-    const delay = Math.ceil(duration * iterations + endDelay - this.timeline.currentTime) + 1;
+    const delay = Math.ceil(duration * iterations + endDelay - this.timeline.getCurrentTime(ntime)) + 1;
     if(this[_finishedDefer] && !this[_finishedDefer].timerID) {
       this[_finishedDefer].timerID = this.timeline.setTimeout(() => {
         this[_finishedDefer].resolve();
@@ -230,7 +313,7 @@ export default class {
     }
   }
 
-  play() {
+  play(ntime) {
     if(this.playState === 'finished') {
       this.cancel();
     }
@@ -239,16 +322,18 @@ export default class {
       if(this.playbackRate <= 0) {
         return;
       }
+      ntime = ntime === undefined ? Timeline.nowtime() : ntime;
       const {delay, playbackRate, timeline} = this[_timing];
       this.timeline = new Timeline({
         originTime: delay,
         playbackRate,
+        ntime
       }, timeline);
-      this[_activeReadyTimer]();
-      this[_activeFinishTimer]();
+      this[_activeReadyTimer](ntime);
+      this[_activeFinishTimer](ntime);
     } else if(this.playState === 'paused') {
       this.timeline.playbackRate = this.playbackRate;
-      this[_activeReadyTimer]();
+      this[_activeReadyTimer](ntime);
     }
   }
 

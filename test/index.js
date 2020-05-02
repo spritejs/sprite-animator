@@ -1,7 +1,7 @@
 const test = require("ava")
 const colors = require('colors')
 
-import {Animator} from '../lib/index'
+import {Animator} from '../src/index'
 
 function sleep(time) {
   const startTime = Date.now()
@@ -13,45 +13,45 @@ function sleep(time) {
 }
 
 
-function makeTimeCompare(caseID, startTime){
-  return function(actual, expect, passedTime = Math.max(Date.now() - startTime, 100)){
+function makeTimeCompare(caseID, startTime) {
+  return function (actual, expect, passedTime = Math.max(Date.now() - startTime, 100)) {
     const precision = Math.abs(actual - expect).toFixed(2),
-          percent = precision / passedTime
+      percent = precision / passedTime
 
     let color = colors.green,
-        pass = true
+      pass = true
 
-    if(percent > 0.05 && percent <= 0.10){
+    if(percent > 0.05 && percent <= 0.10) {
       color = colors.cyan
     }
-    if(percent > 0.10 && percent <= 0.20){
+    if(percent > 0.10 && percent <= 0.20) {
       color = colors.yellow
     }
-    if(percent > 0.20 || Number.isNaN(percent)){
+    if(percent > 0.20 || Number.isNaN(percent)) {
       color = colors.red
       pass = false
     }
 
     console.log(color(`${caseID} - actual: ${actual}, expect: ${expect}, precision: ${precision} | ${percent.toFixed(2)}`))
 
-    return pass    
+    return pass
   }
 }
 
-function _case(fn){
+function _case(fn) {
   const caseID = _case.caseID || 0
   _case.caseID = caseID + 1
-  return async function(t){
+  return async function (t) {
     const startTime = Date.now()
     t.time_compare = makeTimeCompare(caseID, startTime)
     return await fn(t)
   }
 }
 
-function _caseSync(fn){
+function _caseSync(fn) {
   const caseID = _case.caseID || 0
   _case.caseID = caseID + 1
-  return function(t){
+  return function (t) {
     const startTime = Date.now()
     t.time_compare = makeTimeCompare(caseID, startTime)
     return fn(t)
@@ -79,12 +79,12 @@ test('normal animation', _case(async t => {
 }))
 
 test('animation delay', _case(async t => {
-  const animator = new Animator({x: 10}, [{x: 20, y: 0, c:'red'}, {x: 50, y: 100, c:'green'}], 
-        {delay: 200, duration:500, endDelay: 300})
+  const animator = new Animator({x: 10}, [{x: 20, y: 0, c: 'red'}, {x: 50, y: 100, c: 'green'}],
+    {delay: 200, duration: 500, endDelay: 300})
 
   t.truthy(t.time_compare(animator.progress, 0, 1))
   t.is(animator.playState, 'idle')
-  
+
   animator.play()
   t.is(animator.playState, 'pending')
 
@@ -105,13 +105,13 @@ test('animation delay', _case(async t => {
 
   await sleep(400)
   t.truthy(t.time_compare(animator.progress, 1, 1))
-  t.is(animator.playState, 'finished')  
+  t.is(animator.playState, 'finished')
   t.is(animator.frame.c, undefined)
 }))
 
 test('animation ready', _case(async t => {
-  const animator = new Animator({x: 10}, [{x: 20, y: 0, c:'red'}, {x: 50, y: 100, c:'green'}], 
-        {delay: 200, duration:500, endDelay: 300})
+  const animator = new Animator({x: 10}, [{x: 20, y: 0, c: 'red'}, {x: 50, y: 100, c: 'green'}],
+    {delay: 200, duration: 500, endDelay: 300})
 
   t.is(animator.playState, 'idle')
 
@@ -139,8 +139,8 @@ test('animation ready', _case(async t => {
 }))
 
 test('animation finished', _case(async t => {
-  const animator = new Animator({x: 10}, [{x: 20, y: 0, c:'red'}, {x: 50, y: 100, c:'green'}], 
-        {delay: 200, duration:500, endDelay: 300})
+  const animator = new Animator({x: 10}, [{x: 20, y: 0, c: 'red'}, {x: 50, y: 100, c: 'green'}],
+    {delay: 200, duration: 500, endDelay: 300})
 
   t.is(animator.playState, 'idle')
   animator.play()
@@ -165,4 +165,54 @@ test('animation finished', _case(async t => {
   t.is(animator.playState, 'finished')
   t.truthy(t.time_compare(Date.now() - now, 100))
 }))
+
+test('animation getProgress', t => {
+  const animator = new Animator(
+    {x: 10},
+    [{x: 20, y: 0, c: 'red'}, {x: 50, y: 100, c: 'green'}],
+    {delay: 10, duration: 100, endDelay: 40}
+  )
+  
+
+  animator.play(0);
+
+  var p = animator.getProgress(5);
+  t.is(p, 0);
+
+  var p = animator.getProgress(10);
+  t.is(p, 0);
+
+  var p = animator.getProgress(60);
+  t.is(p, .5);
+
+  p = animator.getProgress(110);
+  t.is(p, 1);
+
+  p = animator.getProgress(120);
+  t.is(p, 1);
+})
+
+
+test('animation getFrame', t => {
+  const animator = new Animator(
+    {x: 10},
+    [{x: 20, y: 0, c: 'red'}, {x: 50, y: 100, c: 'green'}],
+    {delay: 10, duration: 100, endDelay: 40}
+  )
+  animator.play(0);
+  var f = animator.getFrame(5);
+  t.deepEqual(f, {x: 10});
+  
+  var f = animator.getFrame(10);
+  t.deepEqual(f, {x: 20, y:0, c: 'red'});
+
+  f = animator.getFrame(60);
+  t.deepEqual(f, {x: 35, y: 50, c: 'red'});
+
+  f = animator.getFrame(110);
+  t.deepEqual(f, {x: 50, y: 100, c: 'green'});
+
+  f = animator.getFrame(120);
+  t.deepEqual(f, {x: 10});
+})
 
