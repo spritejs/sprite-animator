@@ -43,7 +43,7 @@
     "nyc": "^11.1.0",
     "webpack": "^4.16.1",
     "webpack-cli": "^3.1.0",
-    "webpack-dev-server": "^3.1.5"
+    "webpack-dev-server": "^5.2.1"
   },
   "ava": {
     "require": [
